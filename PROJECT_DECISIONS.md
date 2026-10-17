@@ -1,0 +1,50 @@
+# Personal planner: project decisions
+
+**Status:** MVP implementation complete, 17 October 2026.
+
+## Starting point
+
+The project began with only `AGENTS.md` and an empty `sources/` directory. There was no framework, UI, database, lockfile, or Git repository to preserve. The supplied `sources/` directory remains read-only. The available runtime is Node.js 22.22.0 with npm 10.9.7.
+
+## Recommended foundation
+
+- **Web app:** Next.js App Router with TypeScript. Its built-in server components and server actions let the app render database data and handle form submissions without a separate server. Keep database reads and writes in server-only modules, validate every write on the server, and refresh the affected page after a change.
+- **Database:** SQLite in a local file for this single-user learning MVP, using Drizzle ORM, `better-sqlite3`, and Drizzle Kit SQL migrations. This avoids setting up a database service while still giving tasks and goals durable storage and a migration history. Store the database file outside Git. SQLite on a local machine is not a deployment plan for a serverless host; revisit the database and file storage if hosting is added.
+- **Authentication:** omit accounts for now. Assume one trusted person using a private local app. Add authentication and per-user data ownership before putting it on a shared or public server.
+- **Recurrence:** use `rrule-temporal` to describe the supported repeat pattern and ask it only for occurrences in the visible/query date range. Keep each series' date, wall-clock time, and IANA time-zone ID. Store skips, completion, and moved/edited occurrences as separate exceptions keyed by the original occurrence date; changing one occurrence must not rewrite the series. Allow either an end date or an occurrence count; otherwise the series is open-ended.
+- **Recurrence limits:** expose only daily, weekly, every-other-week, every N days, and selected weekdays. No monthly/yearly rules, imported calendars, or natural-language parsing. A local time that falls inside a daylight-saving clock gap has no real matching instant; follow the library's RFC behavior and omit that occurrence. The app relies on the runtime's time-zone data and supports IANA zones; it does not support custom `VTIMEZONE` definitions or user-authored arbitrary RRULE text.
+- **Task data:** title; local scheduled start date/time; calculated end time or duration; one-off completion; creation/update timestamps; optional goal; recurrence rule; and per-date occurrence exceptions. Goals need a name and creation/update timestamps. Validate non-empty title/goal, valid local date/time, positive duration, and a later end than start. Store timestamps as UTC instants and planned recurring times as local calendar fields plus the saved time zone, rather than freezing every future repeat to today's UTC offset.
+- **Settings:** one settings row for the IANA time zone and light/dark/system theme. Never import the database module into a client component or expose connection configuration to the browser.
+
+## UI direction
+
+- **Structure:** a compact left navigation on desktop for Dashboard, Today, Calendar, All tasks, and Goals, with one always-visible “Add task” control. On small screens, use a simple menu/drawer and keep the add control easy to reach. Dashboard is a short overview with Today, Goals, and Calendar sections, not a large monitor.
+- **Calendar and lists:** use a month grid with a selected-day agenda, not a full drag-and-drop scheduling surface. Today shows the date and a chronological task list. All tasks groups tasks under their scheduled day. Goals stay as simple named items that tasks can optionally link to.
+- **Visual hierarchy:** calm, sparse layout; clear page title and date; task title first, time second, goal as quiet supporting text. Use a neutral warm background, white/near-white surfaces, charcoal text, and one muted green accent. Define CSS color variables for light and dark themes.
+- **Typography and spacing:** system sans-serif for a fast, familiar baseline; use a small type scale and consistent 8 px spacing steps, with generous space between sections and compact rows inside task lists.
+- **Interactions:** native labelled date/time inputs and a native dialog for create/edit; calculate the missing end time or duration as soon as the user provides one. A visible button and Command+N open the same form. Completing a recurring task affects only that date; an occurrence menu offers skip, edit this occurrence, or edit the series. Confirm destructive delete actions and provide a useful empty state with the next action.
+- **Accessible behavior:** prefer native controls and preserve visible focus. Use a maintained calendar component for the date grid rather than hand-writing keyboard focus behavior. Check keyboard and screen-reader behavior in the running app; a component's accessibility claims do not prove the finished page is accessible.
+
+## Implementation record
+
+- The local app is named **Daymark**. Source code is in `src/app/`, database schema and server-only connection are in `src/db/`, and range-limited recurrence mapping is in `src/lib/recurrence.ts`.
+- SQLite tables and the first generated migration are in `src/db/schema.ts` and `drizzle/`. The private local database belongs in the ignored `data/` folder.
+- The UI includes Dashboard, Today, Calendar, All tasks with editable date bounds, and Goals. Task dialogs calculate the missing time value, support Command+N, and keep a single repeating occurrence's edits separate from its series.
+- The recurrence window is capped at one year for an individual request. The task date/time is stored as local calendar fields; recurrence uses the user's selected IANA time zone. The start date is included as the first selected-weekday occurrence even when it is not one of the selected weekdays.
+- There is no login: the app assumes a single trusted local user. Add authentication and per-user access controls before shared/public hosting.
+- No external font service is loaded. A system sans-serif stack keeps the interface dependency-light and works offline.
+- `npm audit --omit=dev` reports no runtime dependency vulnerabilities. The full development tool tree reports nine advisories (4 moderate, 5 high) in transitive lint/build tooling (`braces` and the older `esbuild` bundled by Drizzle Kit). npm only offered a forced downgrade to older major tool versions, so that downgrade was not applied; recheck after upstream updates.
+- `npm run typecheck`, `npm run lint`, and `npm run build` complete successfully. No automated tests were added or run. A local browser/screen review could not be completed: the dev server starts on loopback, then exits with a permission error when it tries to open the read-only `AGENTS.md` file. The production build is unaffected.
+- The selected Code Review integration exposes diagnostics for an existing pull request, while this is a local-only repository with no remote or pull request. Changes were reviewed locally; no external review request was created.
+
+## Library and source notes
+
+- Next.js documentation describes the App Router's server/client component model and server-side form actions: [App Router](https://nextjs.org/docs/app), [Forms and Server Actions](https://nextjs.org/docs/app/guides/forms), and [Server Function security considerations](https://nextjs.org/docs/app/api-reference/directives/use-server).
+- Drizzle documents local SQLite drivers and migration generation/application. Its SQLite guide currently labels some examples `@rc`; use the current stable compatible package versions rather than copying release-candidate install commands. The repository's release page showed stable 0.45.4 released 8 October 2026 and active recent changes: [SQLite setup](https://orm.drizzle.team/docs/sqlite/get-started-sqlite), [migration workflow](https://orm.drizzle.team/docs/migrations), [releases](https://github.com/drizzle-team/drizzle-orm/releases), [MIT license](https://github.com/drizzle-team/drizzle-orm/blob/main/LICENSE).
+- `rrule-temporal` is TypeScript-first, accepts recurrence rules, returns timezone-aware `Temporal.ZonedDateTime` occurrences, and supports `between()` for range-limited expansion, `COUNT`/`UNTIL`, and exception dates. Its release notes show recent DST/correctness fixes and tests across multiple Node versions; it is MIT licensed. It is smaller and less proven by adoption than `rrule`, so keep it behind a small recurrence helper and verify Node 22 compatibility in implementation. Its docs omit DST-gap occurrences, matching RFC 5545 behavior: [project and API](https://github.com/ggaabe/rrule-temporal), [releases](https://github.com/ggaabe/rrule-temporal/releases), [MIT license](https://github.com/ggaabe/rrule-temporal/blob/main/LICENSE), [RFC 5545](https://www.rfc-editor.org/info/rfc5545/).
+- For the month grid, prefer DayPicker's current `@daypicker/react` package. It is MIT licensed, React-compatible, customizable, and documents keyboard navigation and focus behavior. Keep the agenda, task rows, goal cards, and navigation custom so the code remains understandable: [DayPicker project and compatibility](https://daypicker.dev/), [accessibility guide](https://daypicker.dev/guides/accessibility), [GitHub repository](https://github.com/gpbl/react-day-picker).
+- Native HTML forms, date/time inputs, and `<dialog>` avoid extra dependencies for basic interactions. Use custom CSS variables rather than a UI kit or theme package for this small visual system.
+
+## Research limits
+
+Current primary documentation and upstream repository files were checked on 17 October 2026. Google Scholar search did not surface a relevant peer-reviewed source for this software/library choice; YouTube results were tutorials, not evidence used for the recommendations. No academic or video evidence was needed to decide the implementation approach. The upstream runtime test matrix lists Node 20, 24, and 26, but not Node 22, so runtime-specific compatibility is not confirmed. npm's audit endpoint became reachable when checked with network access.

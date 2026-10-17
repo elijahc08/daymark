@@ -1,0 +1,11 @@
+.next/
+node_modules/
+data/
+sources/
+.env
+.env.*
+!.env.example
+*.log
+*.tsbuildinfo
+coverage/
+drizzle/meta/_journal.json.tmp
