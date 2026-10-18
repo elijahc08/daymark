@@ -6,6 +6,7 @@ import { settings } from "@/src/db/schema";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import "./globals.css";
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Daymark — personal planner",
