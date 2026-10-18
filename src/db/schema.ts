@@ -8,9 +8,22 @@ export type RepeatRule = {
   count: number | null;
 };
 
+export type RoutineStep = { id: string; title: string; startTime: string; durationMinutes: number };
+export type DashboardWidget = { id: "today" | "goals" | "calendar" | "routines" | "quick-add"; x: number; y: number; w: number; h: number };
+
 export const goals = sqliteTable("goals", {
   id: text("id").primaryKey(),
   title: text("title").notNull(),
+  endDate: text("end_date"),
+  completed: integer("completed", { mode: "boolean" }).notNull().default(false),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
+export const routines = sqliteTable("routines", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  steps: text("steps", { mode: "json" }).$type<RoutineStep[]>().notNull(),
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull(),
 });
@@ -25,6 +38,8 @@ export const tasks = sqliteTable("tasks", {
   completed: integer("completed", { mode: "boolean" }).notNull().default(false),
   goalId: text("goal_id").references(() => goals.id, { onDelete: "set null" }),
   recurrence: text("recurrence", { mode: "json" }).$type<RepeatRule | null>(),
+  routineGroupId: text("routine_group_id"),
+  routineName: text("routine_name"),
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull(),
 });
@@ -52,5 +67,9 @@ export const settings = sqliteTable("settings", {
   id: text("id").primaryKey(),
   timeZone: text("time_zone").notNull().default("Europe/London"),
   theme: text("theme", { enum: ["light", "dark", "system"] }).notNull().default("system"),
+  accentColor: text("accent_color").notNull().default("#4b775f"),
+  colorStyle: text("color_style", { enum: ["hue", "minimal"] }).notNull().default("hue"),
+  fontStyle: text("font_style", { enum: ["current", "mono", "serif", "rounded", "thin"] }).notNull().default("current"),
+  dashboardLayout: text("dashboard_layout", { mode: "json" }).$type<DashboardWidget[] | null>(),
   updatedAt: text("updated_at").notNull(),
 });

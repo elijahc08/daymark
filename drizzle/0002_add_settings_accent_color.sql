@@ -1,0 +1,1 @@
+ALTER TABLE `settings` ADD `accent_color` text DEFAULT '#4b775f' NOT NULL;

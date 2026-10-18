@@ -1,0 +1,172 @@
+# Calendar and to-do apps for irregular, varied days
+
+**Research date: 17 October 2026, Europe/London.**
+
+The strongest match for your brief is not necessarily the app with the most automation. For days that vary substantially, the key is having **two layers at once**: somewhere to keep tasks without prematurely assigning them a time, and an easy way to pull only the relevant tasks into today when you know what the day actually looks like. Apps that insist on turning everything into a tightly planned schedule can create almost as much maintenance as they remove.
+
+My overall conclusion is that **Structured** is the best app to try first if you like seeing a visual shape to your day, while **Todoist** is the strongest alternative if you would rather keep most things as a simple list and schedule selectively. **Things 3** is arguably the calmest task-led option for an all-Apple setup; **Morgen** is the best premium calendar-led choice; and **Sunsama** is excellent if you actively want a daily planning ritual rather than merely tolerating one. The more powerful **Akiflow** and **TickTick** are capable, but their broader feature sets are less naturally aligned with a low-distraction brief. This assessment is based primarily on current first-party product pages and help documentation. citeturn17search0turn16search0turn20search0turn16search1
+
+## What matters most for your kind of schedule
+
+For irregular days, I would weight the criteria differently from someone trying to establish a strict routine.
+
+The most valuable capability is **being able to leave a task genuinely unscheduled**. Structured has an Inbox specifically for tasks with no date or time; Todoist can hold undated tasks indefinitely; Things has its Anytime and Someday lists; and Akiflow separates an Inbox of unplanned tasks from the Today schedule and even supports broad horizons such as “This Week”, “Next Month” and “Someday”. These models let the task exist without pretending that you already know Tuesday at 14:00 is when it will happen. citeturn17search9turn18search6turn19search2
+
+The second requirement is **cheap replanning**: changing your mind should involve a drag, a date change or moving something back into an unscheduled pool, rather than rebuilding a day. Structured lets you drag tasks between times, days and its Inbox, although some drag-and-drop capabilities still differ on Android and Web. Todoist's paid calendar layout lets you drag tasks between dates and time slots. Sunsama and Morgen both let you drag tasks directly onto calendars; Sunsama can additionally move conflicting task blocks automatically. citeturn17search5turn21search2turn21search5
+
+Third, **time estimates should help, not force time-blocking**. Todoist Pro lets a task have a duration before you decide exactly when to do it; Morgen records estimated duration and can turn a task into a calendar block; Akiflow has a task-duration field independently of planning time. Structured asks for an expected length even on Inbox tasks, which is a particularly nice match for “I do not know when yet, but this is roughly a 30-minute job”. citeturn16search3turn23search11turn19search1turn17search9
+
+Finally, I would penalise systems that make productivity itself into a project. A guided planning ritual can be useful, but with irregular days it can also become compulsory administrative work. Sunsama explicitly centres a daily planning flow; Akiflow encourages daily and weekly planning/shutdown rituals, including goals, reflection, statistics and a day rating. TickTick bundles habits, statistics and an achievement score that rises through task completion, focus and habit tracking. None of those is inherently bad, but they run against your preference for an experience that stays in the background. citeturn21search1turn19search3turn19search6
+
+## Comparison at a glance
+
+The “fit” column is **my judgement**, not a vendor claim. Prices are the currently advertised prices I could verify on 17 October 2026; US-dollar prices may be localised at checkout.
+
+| App | Planning model | Can tasks stay unscheduled? | Time estimates / blocks | Changing plans | Main platforms | Free plan / individual price | Fit for your brief |
+|---|---|---|---|---|---|---|---|
+| **Structured** | Visual timeline + Inbox | **Yes** | Expected task length; timeline blocks | Excellent on Apple; good but less complete on Android/Web | iPhone, iPad, Mac, Android, Web; no native Windows app | Strong free core. Pro needed for calendar import, recurrence and Replan; UK App Store shows **£17.99/year** or **£59.99 lifetime** citeturn23search6turn17search6 | **Excellent** — clear structure without requiring every task to have a date |
+| **Todoist** | Task list first; optional calendar | **Yes** | Durations and visual time-blocking on Pro | Very easy | Web, Mac, Windows, Linux, iOS, iPadOS, Android, watches | Free; **$7/month or $60/year** Pro. Free has no calendar layout or task durations citeturn16search0turn23search3 | **Excellent** — most flexible list-first choice |
+| **Things 3** | Task list with Today / Anytime / Someday | **Yes** | No native duration-based task scheduling | Very easy by day; less calendar-centric | Apple only; no web | No permanent free plan; 15-day Mac trial. One-off **$49.99 Mac / $9.99 iPhone / $19.99 iPad** citeturn20search0turn20search1 | **Excellent on Apple** if you do not need time-blocking |
+| **Morgen** | Calendar-led task planner | **Yes** | Estimated durations; manual or AI-assisted time-blocking | Excellent | Mac, Windows, Linux, Web, iOS, Android | No ongoing free plan; 14-day trial; **$30/month or $15/month billed yearly** citeturn16search1turn23search9 | **Very good** if calendar is your primary view |
+| **Sunsama** | Guided daily planner + calendar | In practice, yes, but workflow is strongly day-oriented | Excellent planned-time and time-blocking tools | Excellent; rollover and auto-rescheduling | Web/desktop/mobile ecosystem | No free plan; 14-day trial; **$22/month or $17/month billed yearly** citeturn16search2turn21search0 | **Very good** if you like a deliberate daily-planning ritual |
+| **Akiflow** | Unified tasks + calendar + planning rituals | **Yes** | Excellent durations and time slots | Excellent | Mac, Windows, Web, iOS, Android | No free plan; 7-day trial; **$34/month or $19/month billed yearly** citeturn19search0turn19search7 | **Good but probably overpowered** for your brief |
+| **TickTick** | Task manager + calendar + habits/focus | **Yes** | Task duration and richer calendar in Premium | Very good | iOS, Android, Mac, Windows, Web and others | Free: 9 lists, 99 tasks/list; Premium **$49.99/year** citeturn18search1 | **Good value**, but considerably more feature-dense |
+| **Fantastical** | Calendar first, tasks alongside events | Depends on connected task service | Due-time-oriented rather than a dedicated task-estimation workflow | Good for calendar changes; weaker as a task planner | Mac, Windows, Googlebook, iPhone/iPad; Android mobile planned for 2027 | Useful free calendar/task tier; UK App Store lists Premium IAPs at **£6.99 / £59.99** citeturn22search0turn22search7 | **Good for appointment-heavy days**, less strong for flexible task planning |
+
+A useful dividing line is this: **Structured, Todoist and Things let the to-do list remain primary**, while **Morgen, Sunsama and Akiflow encourage you to translate more of that list into actual calendar time**. TickTick can do either but exposes considerably more adjacent productivity machinery. Fantastical remains first and foremost a calendar. That distinction matters more for your brief than the raw number of features. citeturn17search9turn18search6turn16search3turn21search2turn23search11
+
+## Best minimalist fits
+
+### Structured
+
+**Verified product behaviour.** [Structured](https://structured.app/) is built around one visual daily timeline, with an **Inbox for tasks that have no specific date or time**. Inbox tasks can still have an expected duration; when you decide to schedule one, you can move it onto the timeline. Tasks can also move back from the timeline to the Inbox, which is unusually well suited to a day that has suddenly stopped resembling the plan you made that morning. Drag-and-drop supports moving tasks to another time or day, converting them to all-day items, and moving between the Inbox and timeline. citeturn17search9turn17search5
+
+The free tier is substantive rather than a short trial: timeline tasks, all-day tasks, Inbox tasks, subtasks, notes, basic colours/icons, drag-and-drop and schedule syncing are listed as free. **Structured Pro** adds calendar import, recurring tasks, custom notifications and other features. The newer official Pro documentation says **Replan is Pro and Apple-only**, while calendar import works on Apple, Android and Web; custom notifications are unavailable on Web. citeturn23search6turn17search0
+
+Replan is particularly relevant to irregular days: on supported Apple devices it collects unfinished past tasks and lets you complete, delete, move to Inbox or reschedule each one. Its reminder prompt can be disabled, so it need not become an enforced end-of-day ritual. citeturn17search1
+
+There are meaningful platform caveats. Structured has native Apple and Android apps, but **Windows and Linux use Structured Web rather than a native desktop application**. The Web version was still described by Structured as a work in progress in its August 2026 documentation; it lacks notifications, and not every mobile feature exists there. Android likewise does not yet have every Apple feature. citeturn23search1turn23search2turn23search6
+
+For price, Structured itself deliberately does not publish one global figure because regional pricing varies. Its current UK App Store listing shows **£17.99 annually and £59.99 lifetime**; the help centre also confirms monthly, annual and lifetime options and a three-day Pro trial. Because store pricing can vary by platform and region, the checkout screen is the authoritative figure for your device. ([Structured Pro documentation](https://help.structured.app/en/articles/324674); [UK App Store listing](https://apps.apple.com/gb/app/structured-daily-planner-todo/id1499198946)). citeturn17search0turn17search8turn17search6
+
+**My judgement.** This is the closest match to “give me structure, but do not impose a routine”. The timeline gives a legible shape to **this particular day**, while the Inbox means tomorrow can have an entirely different shape and nothing has to be scheduled merely to remain visible. It requires very little taxonomy: you could plausibly use only Inbox + timeline and ignore most other features. citeturn17search9turn17search5
+
+Its weakness is that the loveliest version of that workflow is currently on Apple. On Android or especially Web, I would rank it slightly below Todoist because some of the friction-removing features are missing. Structured also offers icons, colours, widgets, a focus timer and other optional visual elements, so “minimalist” here means **simple workflow**, not stark monochrome austerity. citeturn17search6turn23search6
+
+### Todoist
+
+**Verified product behaviour.** [Todoist](https://www.todoist.com/) starts from the opposite direction: it is fundamentally a task manager, so a task does **not** have to enter your calendar at all. Its current Beginner plan supports lists, boards, recurring dates, subtasks, labels and priorities. Pro adds calendar layout, task durations, time-blocking and deadlines. Importantly, its current duration model lets you estimate a task's length independently of deciding precisely when it should happen. ([Current plans/pricing FAQ](https://www.todoist.com/help/account-and-billing/plans/todoist-plans-pricing-and-billing-faq-Vq2z0HWL6)). citeturn16search0turn16search3
+
+Its direct Google/Outlook Calendar integration is available even on the free plan. Calendar events appear beside Todoist tasks in Today and Upcoming, while scheduled Todoist tasks can sync out to a dedicated Todoist calendar. There are two qualifications: calendar events are **read-only inside Todoist**, and only one Google or Outlook calendar account can be connected directly, although subscribed calendars provide a workaround. The actual visual calendar layout used for drag-to-time-slot planning is Pro/Business. ([Calendar integration guide](https://www.todoist.com/help/articles/use-the-calendar-integration-rCqwLCt3G)). citeturn21search8
+
+The free-plan restrictions are meaningful if calendar planning is why you are choosing it. As of 15 October 2026, Beginner includes **five active personal projects, three filters and seven days of activity history**, while calendar layout, durations, deadlines and time-blocking require Pro. Pro costs **US$7 monthly or US$60 annually**, equivalent to US$5/month when paid annually. citeturn16search0
+
+Todoist is one of the broadest cross-platform options here: web, macOS, Windows, Ubuntu Linux, iOS/iPadOS, Android, Apple Watch and Wear OS are supported. citeturn23search3
+
+One distraction worth knowing about is **Karma**, Todoist's points/levels/streak system. It tracks task completion and goals, but it is optional and can be turned off, so it need not be part of the experience. citeturn13search1
+
+**My judgement.** Todoist is probably the **lowest-maintenance choice** in this report. You can capture everything, leave most tasks unscheduled, give dates only to the things where the date genuinely matters, and build today's list ad hoc. If you later decide you want a timetable, Pro adds it without forcing you to redesign your task system. citeturn16search0turn21search8
+
+Compared with Structured, however, it gives you less immediate visual sense of the day on the free tier. Once you pay for Pro and use calendar layout, it becomes a strong hybrid, but that makes the **$60/year upgrade much more relevant to your stated requirements than the word “free” initially suggests**. citeturn16search0
+
+### Things 3
+
+**Verified product behaviour.** [Things](https://culturedcode.com/things/) has perhaps the cleanest conceptual model here. Tasks fall naturally into **Today, Upcoming, Anytime and Someday**. Clearing a scheduled date returns a task to Anytime; Someday holds ideas that are not yet actionable. A Things start date means roughly “start considering this on this day”, not “occupy this 45-minute block”, and a separate deadline can represent the actual hard limit. ([Scheduling guide](https://culturedcode.com/things/support/articles/2803579/)). citeturn18search6turn18search9
+
+That distinction makes it deliberately unlike a time-blocking calendar. Things can display Apple Calendar events beside your tasks in Today and Upcoming, but it **cannot send Things tasks directly to Apple Calendar**, and it does not natively schedule tasks as duration-based calendar blocks. Google, Outlook and Exchange calendars have to flow through Apple Calendar first. citeturn20search4
+
+Its largest restriction is absolute: Things is Apple-only. There is no Windows, Android, Linux or browser version. It uses one-off purchases rather than a subscription and is sold separately by device family: the current US prices are **$49.99 Mac, $9.99 iPhone/Watch, $19.99 iPad and $29.99 Vision Pro**. Cultured Code offers a 15-day trial, but not a permanent free edition. ([Platforms and trial](https://culturedcode.com/things/support/articles/2803552/); [official pricing](https://culturedcode.com/things/)). citeturn20search0turn20search1
+
+**My judgement.** For an all-Apple user who thinks “I need a calm list of what I could do, then I'll choose today's few items”, **Things is arguably the most naturally minimalist product of the group**. Its lack of task-duration scheduling is a weakness only if you actually want to map work into hours. For someone who finds time-blocking itself oppressive, that limitation may be an advantage. citeturn18search6turn20search4
+
+I would put it behind Structured for your particular brief because you explicitly asked about integrating calendar and to-do planning, and Things' calendar relationship is mostly *view calendar events next to tasks* rather than *freely move tasks between list and calendar*. But as a low-distraction to-do manager it is a very strong fit. citeturn20search4
+
+## Calendar-led and guided planning options
+
+### Morgen
+
+**Verified product behaviour.** [Morgen](https://www.morgen.so/) is the strongest calendar-led option I found for someone who still wants tasks to behave like tasks. It has its own task manager with task lists, subtasks, due dates, priorities and **estimated durations**, while also integrating Todoist, Notion, Linear, ClickUp, Apple Reminders, Google Tasks, Obsidian, Microsoft To Do and others. citeturn23search9turn23search11
+
+For manual planning, you can drag a task from the task panel onto the calendar. Morgen uses its duration as the length of the block; an unspecified duration defaults to a block that can then be resized. Its newer planning features can also suggest schedules, but the product's positioning is that the user retains approval rather than having an automated system silently rewrite the day. citeturn9search1turn16search7
+
+It is unusually good cross-platform: native macOS, Windows and Linux plus iOS, Android and browser access. There is a caveat, though: Morgen explicitly calls itself **desktop-first**, and features including AI Planner and creation of scheduling links are unavailable from mobile. citeturn23search9turn23search10
+
+There is no permanent free plan. Morgen currently charges **$30/month or $15/month billed annually**, with a 14-day full-access trial and no card required. ([Official pricing](https://www.morgen.so/pricing)). citeturn16search1
+
+**My judgement.** Morgen is the best step up from Structured/Todoist if you discover that you really do want to **see tasks and appointments in one calendar and actively arrange your day around available space**. Its biggest advantage over some automatic schedulers is that manual planning remains first-class: you need not hand control of your day to an algorithm. citeturn16search1turn23search11
+
+For your stated desire for minimalism, I would not start here unless calendar blocking is already a habit. It costs substantially more than Structured or Todoist, and integrating several task systems, calendar automations and AI planning creates more possibilities to configure. That power is valuable when it solves a known problem; it is unnecessary overhead when all you need is “what am I doing next?”. citeturn16search1
+
+### Sunsama
+
+**Verified product behaviour.** [Sunsama](https://www.sunsama.com/) is explicitly designed around a guided **daily planning** process. The flow asks you to review previous work, select today's tasks, consider workload, arrange them, and optionally place them on the calendar. You can re-enter daily planning if the day's priorities change. citeturn21search1
+
+Its time model is excellent. Each task can have “planned time”, which acts as an estimate and contributes to the day's workload total. A task can then be dragged onto Sunsama's calendar, creating a matching working session on either its internal calendar or connected Google, Outlook or iCloud calendar. Auto-rescheduling can shift task blocks after conflicts or early completions. citeturn21search4turn21search2turn21search5
+
+Unfinished tasks automatically roll over to the next day, with an Archive mechanism intended to stop repeatedly postponed tasks from cluttering the main day indefinitely. citeturn21search0
+
+The current price is **$22/month monthly or $17/month billed annually**, after a 14-day unrestricted trial with no credit card. There is no continuing free tier. ([Official pricing](https://www.sunsama.com/pricing)). citeturn16search2
+
+**My judgement.** Sunsama's attraction is that it is not trying to make you maximise output; the workflow is oriented towards deciding what constitutes a reasonable day. That can feel unusually calm compared with conventional productivity software. Its task estimates and workload total are especially good if your problem is routinely putting eight hours of work into a four-hour gap. citeturn21search1turn21search4
+
+But it introduces exactly one thing I am cautious about for you: **a ritual**. You said you want structure without being locked into a rigid daily routine. Sunsama's daily planning is flexible and can be reopened as circumstances change, but the product gets much of its value from repeatedly doing that planning step. If you resent “maintaining the planner”, Structured or Todoist is safer. citeturn21search1
+
+### Fantastical
+
+**Verified product behaviour.** [Fantastical](https://flexibits.com/fantastical) is the calendar-first choice. It connects to existing Google, Microsoft 365, Exchange, iCloud, CalDAV and task services, can show tasks next to events, provides multiple calendar views and supports natural-language event/task creation. Overdue tasks can carry forward. citeturn22search0
+
+The free edition already includes basic calendar management and task support, while Premium adds the wider scheduling and advanced-calendar feature set. The current UK App Store lists individual Premium in-app purchases at **£6.99 and £59.99**, corresponding to its subscription options; because the App Store listing contains some older duplicate purchase entries as well, I would confirm the period and exact charge in checkout rather than infer more from the store list. Flexibits' own pricing page confirms a permanent free level and a 14-day Premium trial but does not expose the numeric price cleanly in its public page text. citeturn18search2turn22search7
+
+Platform coverage changed very recently. Fantastical is now on Mac, Windows and **Googlebook**, as well as iPhone/iPad and Apple wearables; the Googlebook version launched on 5 October 2026. Flexibits says Android-phone/tablet/foldable support is planned for **2027**, so Android mobile is a significant current hole. citeturn22search0turn22search1
+
+**My judgement.** Fantastical makes sense if “irregular days” mostly means **appointments, meetings and events appear in different places every day**, with a comparatively light to-do list around them. It is less compelling if your central problem is deciding which of twenty unscheduled tasks deserves two hours today. Its task capability is real, but the product remains a sophisticated calendar rather than a task-estimation and daily-capacity system. citeturn22search0
+
+## Feature-rich alternatives and their distractions
+
+### TickTick
+
+**Verified product behaviour.** [TickTick](https://ticktick.com/) covers an enormous amount of ground for comparatively little money. Its free tier includes **nine lists, 99 tasks per list, two task reminders, five habits, list/Kanban views, cross-platform sync and a basic calendar**. Premium is **$49.99/year** and expands capacity to 299 lists and 999 tasks per list while adding richer calendar views, task duration, more reminders, themes and other capabilities. ([Official plan comparison](https://ticktick.com/upgrade)). citeturn18search1
+
+For flexible planning it is genuinely strong: tasks can be dragged from the task area into the calendar, then resized to change their duration. citeturn22search8
+
+The catch for this particular brief is not capability but **surface area**. TickTick also incorporates habit tracking, Pomodoro/focus tools, an Eisenhower Matrix, statistics, themes and related productivity modules. More pointedly, it has an achievement system in which creating/completing tasks, focusing and habit tracking increase an achievement score and level. citeturn18search1turn19search6
+
+**My judgement.** TickTick is probably the **best value for money** in the shortlist if you want a task manager, calendar planner, habit tracker and focus timer in one subscription. But that is almost the inverse of your requirement to minimise distraction. You can simply not use those modules, and the core task/calendar interaction is very capable; I would nevertheless choose Todoist over it for you because Todoist makes the simpler workflow easier to preserve. citeturn18search1turn16search0
+
+### Akiflow
+
+**Verified product behaviour.** [Akiflow](https://akiflow.com/) is an exceptionally flexible task/calendar system. New and imported tasks land in an Inbox separated from Today's schedule. From there you can assign a precise date/time, drag a task onto the calendar, place it in a broad period such as This Week or Next Month, or leave it in Someday. Tasks can also carry a duration, deadline and recurrence rule. citeturn19search2turn19search1
+
+Its daily and weekly “Rituals” go further than Sunsama's basic day planning: Akiflow encourages daily planning and shutdown, weekly planning and shutdown, goal review, statistics, reflection and even rating your day. Reminders for these rituals can be configured. citeturn19search3
+
+It runs on Mac and Windows, has browser access and iOS/Android apps, although Akiflow says the desktop app has additional shortcut-driven functionality that the browser lacks. citeturn19search4turn19search7
+
+There is no free tier. The current Pro plan is **$34/month or $19/month billed annually ($228/year)**, following a seven-day trial; Akiflow states that a card is required and the selected subscription begins after the trial unless cancelled. ([Official pricing](https://akiflow.com/pricing)). citeturn19search0
+
+**My judgement.** The underlying Inbox → selectively schedule workflow is actually an excellent match for irregular days. What lowers Akiflow in this ranking is everything layered around it: rituals, integrations, AI, performance review and a premium price. For someone trying to build a sophisticated personal operating system, that may be a strength. For someone explicitly trying not to spend much attention on their productivity software, it looks like more machinery than necessary. citeturn19search2turn19search3turn19search0
+
+## Best fits and final recommendation
+
+Seen against your requirements rather than generic “productivity app” criteria, I would group the choices this way:
+
+**Best overall fit: Structured.** It provides visible structure only where you need it: today's timeline. The Inbox protects you from having to invent dates for everything else. Rescheduling is tactile and immediate, expected duration is built into the task model, and the basic workflow requires almost no organisation beyond “Inbox” and “today”. The free tier is usable rather than ceremonial. The main reservation is platform parity: Replan remains Apple-only, Web lacks notifications, and the Web/Android versions do not yet match every Apple feature. citeturn17search9turn17search5turn23search6
+
+**Best task-led and cross-platform fit: Todoist.** Choose this over Structured if you instinctively prefer a list to a timeline, use Windows/Linux/Android heavily, or want scheduling to remain entirely optional. It is particularly good at preventing calendar overcommitment because unscheduled tasks are first-class citizens. The trade-off is that the features most relevant to deliberate time planning—task duration, calendar layout and time-blocking—are behind the $60/year Pro plan. citeturn16search0turn23search3
+
+**Best Apple-only minimalist fit: Things 3.** Choose it when “structure” means a well-curated Today list rather than filling a timetable. Anytime and Someday fit irregular lives remarkably well. The corresponding downside is equally clear: it is not a proper time-blocking system and its calendar integration is view-only from the task-management side. citeturn18search6turn20search4
+
+**Best premium calendar-led fit: Morgen.** Choose it when seeing tasks physically occupy calendar space is useful, especially across mixed desktop operating systems. It is more flexible than an auto-scheduler because manual arrangement remains central. You pay substantially more and accept more configuration in return. citeturn16search1turn23search9
+
+**Best for a calming planning ritual: Sunsama.** Choose it when you actively want five or ten minutes of deliberate planning to define the day. Its planned-time, workload and timeboxing system is excellent. Avoid it if having to “plan in the planner” is itself something you are likely to procrastinate on. citeturn21search1turn21search4
+
+**Best value for lots of functions: TickTick.** It is hard to beat on functionality per pound/dollar, but habits, focus features, statistics and achievement scoring make it the least natural match for a deliberate low-distraction setup among the inexpensive options. citeturn18search1turn19search6
+
+**Best power-user option: Akiflow.** Its unscheduled Inbox and broad planning horizons are excellent, but its ritual/performance layer and pricing make it hard to justify when minimalism is an explicit objective. citeturn19search2turn19search3
+
+**Best traditional calendar: Fantastical.** It is compelling when appointments are the fixed skeleton of the day and tasks are secondary. It is not the one I would choose primarily to manage a large, fluid pool of work. Android mobile availability is also still a future feature as of the research date. citeturn22search0
+
+My practical ranking for your stated needs is therefore **Structured → Todoist → Things 3 (if Apple-only) → Morgen → Sunsama → TickTick → Akiflow → Fantastical**. That ordering deliberately rewards low maintenance and ease of changing one's mind rather than breadth of functionality.
+
+**What I would try first: Structured.** Start with almost nothing configured: keep everything uncertain in the **Inbox**, put only the handful of things that genuinely need a place today onto the timeline, and avoid creating recurring routines merely because the app permits them. That gives you visible structure for a varied day without making tomorrow inherit today's template. The important product facts behind that recommendation—the unscheduled Inbox, task durations, drag-and-drop timeline and ability to move tasks back out of the schedule—are all part of Structured's current design. citeturn17search9turn17search5
+
+**One realistic alternative: Todoist.** It is the better first choice instead when you want an even looser, list-first system or require strong Windows/Linux/Android support. You can stay on the free tier while learning whether simple undated/dated lists are enough; only move to Pro if duration estimates and visual calendar time-blocking turn out to solve a real problem. I would switch off Karma immediately to keep the experience aligned with your low-distraction preference. citeturn16search0turn23search3turn13search1

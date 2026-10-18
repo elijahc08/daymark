@@ -5,8 +5,8 @@ import { and, eq, gte, lte, or } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { db } from "@/src/db";
-import { goals, occurrenceExceptions, settings, tasks, type RepeatRule } from "@/src/db/schema";
-import { occurrencesForRange } from "@/src/lib/recurrence";
+import { goals, occurrenceExceptions, routines, settings, tasks, type DashboardWidget, type RepeatRule, type RoutineStep } from "@/src/db/schema";
+import { isOccurrenceDate, occurrencesForRange } from "@/src/lib/recurrence";
 import { Temporal } from "@js-temporal/polyfill";
 
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
@@ -26,10 +26,25 @@ const RepeatSchema = z.object({
   weekdays: z.array(z.coerce.number().int().min(0).max(6)).max(7),
   endDate: z.string().nullable(),
   count: z.number().int().min(1).max(10000).nullable(),
+}).superRefine((rule, context) => {
+  if (new Set(rule.weekdays).size !== rule.weekdays.length) {
+    context.addIssue({ code: "custom", path: ["weekdays"], message: "Choose each weekday only once." });
+  }
 });
+const RoutineStepsSchema = z.array(z.object({
+  id: z.string().min(1).max(64),
+  title: z.string().trim().min(1).max(160),
+  startTime: z.string().refine(validTime, "Choose a valid task time."),
+  durationMinutes: z.number().int().min(1).max(1439),
+})).min(1, "Add at least one task to the routine.").max(30, "A routine can contain up to 30 tasks.");
 
 function now() {
   return new Date().toISOString();
+}
+
+async function currentTimeZone() {
+  const savedSettings = await db.select({ timeZone: settings.timeZone }).from(settings).where(eq(settings.id, "default")).get();
+  return savedSettings?.timeZone ?? "Europe/London";
 }
 
 function minuteOf(value: string) {
@@ -69,8 +84,9 @@ export async function createTask(formData: FormData) {
   const suppliedEnd = String(formData.get("endTime") ?? "");
   const suppliedDuration = String(formData.get("durationMinutes") ?? "");
   const goalId = String(formData.get("goalId") ?? "") || null;
-  const repeatFrequency = String(formData.get("repeatFrequency") ?? "none");
-  const repeatInterval = Number(formData.get("repeatInterval") ?? 1);
+  const repeatChoice = String(formData.get("repeatFrequency") ?? "none");
+  const repeatFrequency = repeatChoice === "every-other-week" ? "weekly" : repeatChoice;
+  const repeatInterval = repeatChoice === "every-other-week" ? 2 : Number(formData.get("repeatInterval") ?? 1);
   const weekdays = formData.getAll("weekdays").map(Number);
   const endDate = String(formData.get("repeatEndDate") ?? "") || null;
   const countRaw = String(formData.get("repeatCount") ?? "");
@@ -113,6 +129,85 @@ export async function createTask(formData: FormData) {
   return { ok: true };
 }
 
+export async function saveRoutine(id: string | null, name: string, steps: unknown) {
+  const parsedName = z.string().trim().min(1, "Enter a routine name.").max(80).safeParse(name);
+  if (!parsedName.success) return { error: parsedName.error.issues[0]?.message ?? "Enter a routine name." };
+  const parsedSteps = RoutineStepsSchema.safeParse(steps);
+  if (!parsedSteps.success) return { error: parsedSteps.error.issues[0]?.message ?? "Check the routine tasks." };
+  if (parsedSteps.data.some((step) => !endTimeFrom(step.startTime, step.durationMinutes))) return { error: "Each routine task must finish before midnight." };
+  const stamp = now();
+  const values = { name: parsedName.data, steps: parsedSteps.data as RoutineStep[], updatedAt: stamp };
+  if (id) {
+    const parsedId = z.string().uuid().safeParse(id);
+    if (!parsedId.success) return { error: "That routine could not be found." };
+    const updated = await db.update(routines).set(values).where(eq(routines.id, parsedId.data)).returning({ id: routines.id });
+    if (updated.length === 0) return { error: "That routine no longer exists." };
+    revalidatePath("/");
+    return { ok: true, id: parsedId.data };
+  }
+  const newId = randomUUID();
+  await db.insert(routines).values({ id: newId, ...values, createdAt: stamp });
+  revalidatePath("/");
+  return { ok: true, id: newId };
+}
+
+export async function deleteRoutine(id: string) {
+  const parsedId = z.string().uuid().safeParse(id);
+  if (!parsedId.success) return { error: "That routine could not be found." };
+  await db.delete(routines).where(eq(routines.id, parsedId.data));
+  revalidatePath("/");
+  return { ok: true };
+}
+
+export async function scheduleRoutine(id: string, scheduledDate: string, frequency: string, interval: number, endDate: string, count: string, weekdays: number[]) {
+  const parsedId = z.string().uuid().safeParse(id);
+  if (!parsedId.success || !validDate(scheduledDate)) return { error: "Choose a valid routine and start date." };
+  const routine = await db.select().from(routines).where(eq(routines.id, parsedId.data)).get();
+  if (!routine) return { error: "That routine no longer exists." };
+
+  let recurrence: RepeatRule | null = null;
+  if (frequency !== "none") {
+    const parsedRule = RepeatSchema.safeParse({
+      frequency: frequency === "every-other-week" ? "weekly" : frequency,
+      interval: frequency === "every-other-week" ? 2 : interval,
+      weekdays,
+      endDate: endDate || null,
+      count: count ? Number(count) : null,
+    });
+    if (!parsedRule.success) return { error: "Check the repeat schedule." };
+    if (parsedRule.data.frequency === "weekdays" && parsedRule.data.weekdays.length === 0) return { error: "Choose at least one weekday." };
+    if (parsedRule.data.endDate && (!validDate(parsedRule.data.endDate) || parsedRule.data.endDate < scheduledDate)) return { error: "Repeat end must be on or after the start date." };
+    if (parsedRule.data.count && parsedRule.data.endDate) return { error: "Choose either an end date or an occurrence count." };
+    recurrence = parsedRule.data;
+  }
+
+  const steps = RoutineStepsSchema.safeParse(routine.steps);
+  if (!steps.success || steps.data.some((step) => !endTimeFrom(step.startTime, step.durationMinutes))) return { error: "This routine has invalid task times. Edit it before scheduling." };
+  const stamp = now();
+  const routineGroupId = randomUUID();
+  db.transaction((transaction) => {
+    for (const step of steps.data) {
+      transaction.insert(tasks).values({
+        id: randomUUID(),
+        title: step.title,
+        scheduledDate,
+        startTime: step.startTime,
+        endTime: endTimeFrom(step.startTime, step.durationMinutes)!,
+        durationMinutes: step.durationMinutes,
+        completed: false,
+        goalId: null,
+        recurrence,
+        routineGroupId,
+        routineName: routine.name,
+        createdAt: stamp,
+        updatedAt: stamp,
+      }).run();
+    }
+  });
+  revalidatePath("/");
+  return { ok: true };
+}
+
 export async function updateTask(id: string, formData: FormData) {
   const title = String(formData.get("title") ?? "").trim();
   const scheduledDate = String(formData.get("scheduledDate") ?? "");
@@ -150,7 +245,10 @@ export async function saveOccurrence(taskId: string, originalDate: string, formD
   const endTime = String(formData.get("endTime") ?? "");
   const durationMinutes = Number(formData.get("durationMinutes") ?? 0);
   if (!title || title.length > 160 || !validDate(originalDate) || !validDate(movedDate) || !validTime(startTime) || !validTime(endTime) || !Number.isInteger(durationMinutes) || durationMinutes < 1 || durationMinutes > 1439 || minuteOf(endTime) <= minuteOf(startTime) || minuteOf(endTime) - minuteOf(startTime) !== durationMinutes) return { error: "Check the occurrence details." };
-  if (!(await db.select({ id: tasks.id }).from(tasks).where(eq(tasks.id, taskId)).get())) return { error: "This repeating task no longer exists." };
+  const task = await db.select().from(tasks).where(eq(tasks.id, taskId)).get();
+  if (!task?.recurrence || !isOccurrenceDate(task, originalDate, await currentTimeZone())) {
+    return { error: "That date is not an occurrence in this repeating task." };
+  }
   const stamp = now();
   await db.insert(occurrenceExceptions).values({ id: randomUUID(), taskId, originalDate, title, skipped: false, completed: false, movedDate, startTime, endTime, durationMinutes, createdAt: stamp, updatedAt: stamp }).onConflictDoUpdate({ target: [occurrenceExceptions.taskId, occurrenceExceptions.originalDate], set: { title, skipped: false, movedDate, startTime, endTime, durationMinutes, updatedAt: stamp } });
   revalidatePath("/");
@@ -162,9 +260,11 @@ export async function setCompleted(taskId: string, occurrenceDate: string, compl
   const task = await db.select().from(tasks).where(eq(tasks.id, taskId)).get();
   if (!task) return { error: "This task no longer exists." };
   if (task.recurrence) {
+    if (!isOccurrenceDate(task, occurrenceDate, await currentTimeZone())) return { error: "That date is not an occurrence in this repeating task." };
     const stamp = now();
     await db.insert(occurrenceExceptions).values({ id: randomUUID(), taskId, originalDate: occurrenceDate, skipped: false, completed, createdAt: stamp, updatedAt: stamp }).onConflictDoUpdate({ target: [occurrenceExceptions.taskId, occurrenceExceptions.originalDate], set: { completed, skipped: false, updatedAt: stamp } });
   } else {
+    if (task.scheduledDate !== occurrenceDate) return { error: "That date does not match this task." };
     await db.update(tasks).set({ completed, updatedAt: now() }).where(eq(tasks.id, taskId));
   }
   revalidatePath("/");
@@ -175,6 +275,7 @@ export async function skipOccurrence(taskId: string, occurrenceDate: string) {
   if (!validDate(occurrenceDate)) return { error: "Choose a valid occurrence date." };
   const task = await db.select().from(tasks).where(eq(tasks.id, taskId)).get();
   if (!task?.recurrence) return { error: "This repeating task no longer exists." };
+  if (!isOccurrenceDate(task, occurrenceDate, await currentTimeZone())) return { error: "That date is not an occurrence in this repeating task." };
   const stamp = now();
   await db.insert(occurrenceExceptions).values({ id: randomUUID(), taskId, originalDate: occurrenceDate, skipped: true, completed: false, createdAt: stamp, updatedAt: stamp }).onConflictDoUpdate({ target: [occurrenceExceptions.taskId, occurrenceExceptions.originalDate], set: { skipped: true, updatedAt: stamp } });
   revalidatePath("/");
@@ -186,11 +287,22 @@ export async function deleteTask(id: string) {
   revalidatePath("/");
 }
 
-export async function createGoal(title: string) {
+export async function createGoal(title: string, endDate: string) {
   const parsed = z.string().trim().min(1, "Enter a goal name.").max(120).safeParse(title);
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Enter a goal name." };
+  const parsedEndDate = z.string().refine((value) => value === "" || validDate(value), "Choose a valid end date.").safeParse(endDate);
+  if (!parsedEndDate.success) return { error: parsedEndDate.error.issues[0]?.message ?? "Choose a valid end date." };
   const stamp = now();
-  await db.insert(goals).values({ id: randomUUID(), title: parsed.data, createdAt: stamp, updatedAt: stamp });
+  await db.insert(goals).values({ id: randomUUID(), title: parsed.data, endDate: parsedEndDate.data || null, completed: false, createdAt: stamp, updatedAt: stamp });
+  revalidatePath("/");
+  return { ok: true };
+}
+
+export async function setGoalCompleted(goalId: string, completed: boolean) {
+  const parsed = z.object({ id: z.string().uuid(), completed: z.boolean() }).safeParse({ id: goalId, completed });
+  if (!parsed.success) return { error: "Check the goal update." };
+  const result = await db.update(goals).set({ completed: parsed.data.completed, updatedAt: now() }).where(eq(goals.id, parsed.data.id)).returning({ id: goals.id });
+  if (result.length === 0) return { error: "This goal no longer exists." };
   revalidatePath("/");
   return { ok: true };
 }
@@ -200,19 +312,45 @@ export async function deleteGoal(id: string) {
   revalidatePath("/");
 }
 
-export async function saveSettings(timeZone: string, theme: "light" | "dark" | "system") {
+export async function saveSettings(timeZone: string, theme: "light" | "dark" | "system", accentColor: string, colorStyle: "hue" | "minimal", fontStyle: "current" | "mono" | "serif" | "rounded" | "thin") {
   const validZone = z.string().refine((value) => {
     try { new Intl.DateTimeFormat("en", { timeZone: value }); return true; } catch { return false; }
   }, "Choose a valid time zone.").safeParse(timeZone);
   if (!validZone.success) return { error: "Choose a valid time zone." };
   const validTheme = z.enum(["light", "dark", "system"]).safeParse(theme);
   if (!validTheme.success) return { error: "Choose a valid appearance." };
+  const validAccentColor = z.string().regex(/^#[0-9a-fA-F]{6}$/).safeParse(accentColor);
+  if (!validAccentColor.success) return { error: "Choose a valid accent colour." };
+  const validColorStyle = z.enum(["hue", "minimal"]).safeParse(colorStyle);
+  if (!validColorStyle.success) return { error: "Choose a valid colour style." };
+  const validFontStyle = z.enum(["current", "mono", "serif", "rounded", "thin"]).safeParse(fontStyle);
+  if (!validFontStyle.success) return { error: "Choose a valid font style." };
   const stamp = now();
-  await db.insert(settings).values({ id: "default", timeZone, theme, updatedAt: stamp }).onConflictDoUpdate({ target: settings.id, set: { timeZone, theme, updatedAt: stamp } });
+  await db.insert(settings).values({ id: "default", timeZone, theme, accentColor: validAccentColor.data.toLowerCase(), colorStyle: validColorStyle.data, fontStyle: validFontStyle.data, updatedAt: stamp }).onConflictDoUpdate({ target: settings.id, set: { timeZone, theme, accentColor: validAccentColor.data.toLowerCase(), colorStyle: validColorStyle.data, fontStyle: validFontStyle.data, updatedAt: stamp } });
+  revalidatePath("/");
+  return { ok: true };
+}
+
+const DashboardLayoutSchema = z.array(z.object({
+  id: z.enum(["today", "goals", "calendar", "routines", "quick-add"]),
+  x: z.number().int().min(0).max(11),
+  y: z.number().int().min(0).max(10000),
+  w: z.number().int().min(6).max(12),
+  h: z.number().int().min(6).max(1000),
+})).max(5).superRefine((widgets, context) => {
+  if (new Set(widgets.map(({ id }) => id)).size !== widgets.length) context.addIssue({ code: "custom", message: "Each dashboard widget can appear only once." });
+  widgets.forEach((widget, index) => { if (widget.x + widget.w > 12) context.addIssue({ code: "custom", path: [index, "x"], message: "The widget must fit within the dashboard." }); });
+});
+
+export async function saveDashboardLayout(layout: DashboardWidget[]) {
+  const parsed = DashboardLayoutSchema.safeParse(layout);
+  if (!parsed.success) return { error: "Check the dashboard widgets and try again." };
+  const stamp = now();
+  await db.insert(settings).values({ id: "default", dashboardLayout: parsed.data as DashboardWidget[], updatedAt: stamp }).onConflictDoUpdate({ target: settings.id, set: { dashboardLayout: parsed.data as DashboardWidget[], updatedAt: stamp } });
   revalidatePath("/");
   return { ok: true };
 }
 
 export async function initializeSettings() {
-  await db.insert(settings).values({ id: "default", timeZone: "Europe/London", theme: "system", updatedAt: now() }).onConflictDoNothing();
+  await db.insert(settings).values({ id: "default", timeZone: "Europe/London", theme: "system", accentColor: "#4b775f", colorStyle: "hue", fontStyle: "current", updatedAt: now() }).onConflictDoNothing();
 }

@@ -1,0 +1,6 @@
+Font Awesome 4.3.0
+Font: SIL Open Font License 1.1
+CSS: MIT License
+Original asset supplied from /Users/elijahcathie/code/GitHub/ourcew-web/app/assets/stylesheets/admin/theme/lib/fontawesome/.
+License and attribution notice shown in the supplied font-awesome.css header: http://fontawesome.io/license
+Upstream project: https://github.com/FortAwesome/Font-Awesome

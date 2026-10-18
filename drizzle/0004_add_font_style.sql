@@ -1,0 +1,1 @@
+ALTER TABLE `settings` ADD `font_style` text DEFAULT 'current' NOT NULL;

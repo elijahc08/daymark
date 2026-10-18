@@ -1,0 +1,1 @@
+ALTER TABLE `settings` ADD `color_style` text DEFAULT 'hue' NOT NULL;
