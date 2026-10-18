@@ -12,5 +12,6 @@ mkdirSync(dirname(fileName), { recursive: true });
 const sqlite = new Database(fileName);
 sqlite.pragma("journal_mode = WAL");
 sqlite.pragma("foreign_keys = ON");
+sqlite.exec("PRAGMA busy_timeout = 5000;");
 
 export const db = drizzle({ client: sqlite, schema });
