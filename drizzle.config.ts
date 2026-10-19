@@ -2,7 +2,8 @@ import { mkdirSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { defineConfig } from "drizzle-kit";
 
-const databasePath = join(process.cwd(), "data", basename(process.env.DB_FILE_NAME ?? "planner.sqlite"));
+const databaseDirectory = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? join(process.cwd(), "data");
+const databasePath = join(databaseDirectory, basename(process.env.DB_FILE_NAME ?? "planner.sqlite"));
 mkdirSync(dirname(databasePath), { recursive: true });
 
 export default defineConfig({

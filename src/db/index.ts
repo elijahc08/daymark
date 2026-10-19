@@ -6,7 +6,8 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import * as schema from "./schema";
 
 const databaseFile = basename(process.env.DB_FILE_NAME ?? "planner.sqlite");
-const fileName = join(process.cwd(), "data", databaseFile);
+const databaseDirectory = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? join(process.cwd(), "data");
+const fileName = join(databaseDirectory, databaseFile);
 mkdirSync(dirname(fileName), { recursive: true });
 
 const sqlite = new Database(fileName);

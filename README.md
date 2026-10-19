@@ -14,6 +14,10 @@ npm run dev
 
 Open the local address printed by Next.js. The SQLite database is created at `data/planner.sqlite`; that folder is ignored by Git, so your private task data is not committed. If you want a different database filename, set `DB_FILE_NAME` before running both the migration and app commands. The file is kept inside `data/`. `.env.example` shows the default value.
 
+### Keep data between Railway deployments
+
+Settings, tasks, goals, and routines are stored in SQLite. To keep them when Railway deploys a new version, attach a Railway Volume to the web service with mount path `/app/data`. Railway sets `RAILWAY_VOLUME_MOUNT_PATH` automatically; the app and its startup schema update use that directory for the database. Set the service start command to `npm start` so it applies the schema before launching Next.js. Keep this service to one running replica because SQLite is a single-file database. Do not wipe or detach the volume if you want to keep its data. A new volume starts empty, so back up any currently deployed database you need before attaching it; files outside the volume are not copied into it.
+
 ## Useful commands
 
 | Command | What it does |
