@@ -4,7 +4,7 @@ import { DayPicker, type DayButtonProps } from "@daypicker/react";
 import "@daypicker/react/style.css";
 import { HexColorInput, HexColorPicker } from "react-colorful";
 import ReactGridLayout, { useContainerWidth, verticalCompactor, type Layout } from "react-grid-layout";
-import { createContext, Fragment, useCallback, useContext, useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from "react";
+import { createContext, Fragment, useCallback, useContext, useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { createGoal, createTask, deleteGoal, deleteRoutine, deleteTask, getRange, saveDashboardLayout, saveOccurrence, saveRoutine, saveSettings, scheduleRoutine, setCompleted, setGoalCompleted, updateTask } from "./actions";
 import type { DashboardWidget, RepeatRule, RoutineStep } from "@/src/db/schema";
 import { dashboardWidgetsFromGrid, defaultDashboardLayout, normalizeDashboardLayout, packDashboardWidgets } from "@/src/lib/dashboard-layout";
@@ -285,17 +285,6 @@ export function Planner({ initial }: { initial: Initial }) {
   }, [view, today]);
 
   useEffect(() => {
-    if (view !== "All tasks" || !hasMoreAllTasks || !allTasksSentinel.current) return;
-    allTasksAutoLoadArmed.current = false;
-    const observer = new IntersectionObserver(([entry]) => {
-      if (!entry.isIntersecting) { allTasksAutoLoadArmed.current = true; return; }
-      if (allTasksAutoLoadArmed.current) void loadNextAllTasksWeek();
-    }, { rootMargin: "0px 0px 120px 0px" });
-    observer.observe(allTasksSentinel.current);
-    return () => observer.disconnect();
-  }, [view, hasMoreAllTasks, loadNextAllTasksWeek, rangeLoading, rangeError]);
-
-  useEffect(() => {
     if (view === "All tasks") return;
     let current = true;
     const loadingTimer = window.setTimeout(() => {
@@ -352,6 +341,18 @@ export function Planner({ initial }: { initial: Initial }) {
     (groups[item.occurrenceDate] ??= []).push(item);
     return groups;
   }, {}), [visibleItems]);
+  const hasAllTaskRows = Object.keys(groupedItems).length > 0 || completedItems.length > 0;
+
+  useEffect(() => {
+    if (view !== "All tasks" || !hasMoreAllTasks || rangeLoading || rangeError || !hasAllTaskRows || !allTasksSentinel.current) return;
+    allTasksAutoLoadArmed.current = false;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) { allTasksAutoLoadArmed.current = true; return; }
+      if (allTasksAutoLoadArmed.current) void loadNextAllTasksWeek();
+    }, { rootMargin: "0px 0px 220px 0px" });
+    observer.observe(allTasksSentinel.current);
+    return () => observer.disconnect();
+  }, [view, hasMoreAllTasks, hasAllTaskRows, loadNextAllTasksWeek, rangeLoading, rangeError]);
   const itemsByDate = useMemo(() => items.filter((item) => !item.completed || animatingOut.includes(item.id)).reduce<Record<string, Item[]>>((groups, item) => {
     (groups[item.occurrenceDate] ??= []).push(item);
     return groups;
@@ -530,18 +531,21 @@ export function Planner({ initial }: { initial: Initial }) {
           </div>
           {rangeError && <div className="inline-error" role="alert"><span>{rangeError}</span><button className="quiet-button" onClick={() => refreshRange()}>Try again</button></div>}
           {rangeLoading ? <div className="calendar-loading" role="status">Loading scheduled tasks…</div> : calendarMode === "Week"
-            ? <CalendarWeek startDate={selectedWeek[0]} selectedDate={selectedDate} today={today} itemsByDate={itemsByDate} onSelectDate={setSelectedDate} onAdd={(date) => setTaskDialog({ date })} onEdit={(item) => editItem(item)} />
+            ? <div className="week-fill"><CalendarWeek startDate={selectedWeek[0]} selectedDate={selectedDate} today={today} itemsByDate={itemsByDate} onSelectDate={setSelectedDate} onAdd={(date) => setTaskDialog({ date })} onEdit={(item) => editItem(item)} /></div>
             : calendarMode === "Month"
-              ? <div className="calendar-layout"><section className="calendar-card"><MonthItemsContext.Provider value={itemsByDate}><DayPicker mode="single" month={month} selected={localDate(selectedDate)} onSelect={(date) => date && setSelectedDate(dateKey(date))} onMonthChange={(value) => { setMonth(value); setSelectedDate(dateKey(value)); }} fixedWeeks weekStartsOn={1} components={{ DayButton: MonthDayButton }} aria-label="Calendar month" footer={`${Object.keys(itemsByDate).length} days with scheduled tasks`} /></MonthItemsContext.Provider></section><section className="agenda-card"><div className="section-heading"><div><h2>{prettyDate(selectedDate, { weekday: "long", day: "numeric", month: "long" })}</h2><p>{visibleItems.length} {visibleItems.length === 1 ? "task" : "tasks"}</p></div><button className="text-button" onClick={() => setTaskDialog({ date: selectedDate })}>＋ Add</button></div><TaskList items={visibleItems} animatingOut={animatingOut} goalNames={initial.goalNames} onToggle={toggleComplete} onEdit={(item) => editItem(item)} onDelete={removeItem} emptySearch={search.trim()} onEmptyAdd={() => setTaskDialog({ date: selectedDate })} /></section></div>
+              ? <CalendarSplit
+                  calendar={<section className="calendar-card"><MonthItemsContext.Provider value={itemsByDate}><DayPicker mode="single" month={month} selected={localDate(selectedDate)} onSelect={(date) => date && setSelectedDate(dateKey(date))} onMonthChange={(value) => { setMonth(value); setSelectedDate(dateKey(value)); }} hideNavigation fixedWeeks weekStartsOn={1} components={{ DayButton: MonthDayButton }} aria-label="Calendar month" footer={`${Object.keys(itemsByDate).length} days with scheduled tasks`} /></MonthItemsContext.Provider></section>}
+                  agenda={<section className="agenda-card"><div className="section-heading"><div><h2>{prettyDate(selectedDate, { weekday: "long", day: "numeric", month: "long" })}</h2><p>{visibleItems.length} {visibleItems.length === 1 ? "task" : "tasks"}</p></div><button className="text-button" onClick={() => setTaskDialog({ date: selectedDate })}>＋ Add</button></div><TaskList items={visibleItems} animatingOut={animatingOut} goalNames={initial.goalNames} onToggle={toggleComplete} onEdit={(item) => editItem(item)} onDelete={removeItem} emptySearch={search.trim()} onEmptyAdd={() => setTaskDialog({ date: selectedDate })} /></section>}
+                />
               : <CalendarYear year={selectedYear} months={itemsByDate} goals={goals} onOpenMonth={(value) => { setCalendarMode("Month"); setMonth(value); setSelectedDate(dateKey(value)); }} onAddGoal={() => setGoalDialog(true)} onViewGoals={() => setView("Goals")} />}
         </section>}
         {(view === "Today" || view === "All tasks") && <section className="list-panel">
           {view === "All tasks" ? <>
             {rangeLoading ? <div className="calendar-loading" role="status">Loading tasks…</div> : rangeError ? <div className="inline-error" role="alert"><span>{rangeError}</span><button className="quiet-button" onClick={() => refreshRange()}>Try again</button></div> : Object.keys(groupedItems).length === 0 && completedItems.length === 0 ? <EmptyState view={view} search={search.trim()} onAdd={() => setTaskDialog({ date: today })} /> : <>{Object.entries(groupedItems).sort(([a], [b]) => a.localeCompare(b)).map(([date, rows]) => <section className="day-group" key={date}><h2>{date === today ? "Today" : prettyDate(date)}</h2><TaskList items={rows} animatingOut={animatingOut} goalNames={initial.goalNames} onToggle={toggleComplete} onEdit={(item) => editItem(item)} onDelete={removeItem} /></section>)}{completedItems.length > 0 && <details className="completed-disclosure"><summary>Completed · {completedItems.length}</summary><TaskList items={completedItems} goalNames={initial.goalNames} onToggle={toggleComplete} onEdit={(item) => editItem(item)} onDelete={removeItem} /></details>}</>}
-            {!rangeLoading && !rangeError && <div className="all-tasks-pagination">
+            {!rangeLoading && !rangeError && hasAllTaskRows && <div className="all-tasks-pagination">
               <div ref={allTasksSentinel} className="all-tasks-load-sentinel" aria-hidden="true" />
               {allTasksLoadError && <div className="inline-error" role="alert"><span>{allTasksLoadError}</span><button className="quiet-button" onClick={() => loadNextAllTasksWeek()}>Try again</button></div>}
-              {loadingMoreAllTasks ? <p className="calendar-loading" role="status">Loading another week…</p> : hasMoreAllTasks ? <button type="button" className="text-button" onClick={() => loadNextAllTasksWeek()}>Load another week</button> : <p className="quiet">You’ve reached the end of the available year.</p>}
+              {loadingMoreAllTasks && <p className="quiet" role="status">Loading more tasks…</p>}
             </div>}
           </> : rangeLoading ? <div className="calendar-loading" role="status">Loading tasks…</div> : rangeError ? <div className="inline-error" role="alert"><span>{rangeError}</span><button className="quiet-button" onClick={() => refreshRange()}>Try again</button></div> : Object.keys(groupedItems).length === 0 && completedItems.length === 0 ? <EmptyState view={view} search={search.trim()} onAdd={() => setTaskDialog({ date: today })} /> : <>{Object.entries(groupedItems).sort(([a], [b]) => a.localeCompare(b)).map(([date, rows]) => <section className="day-group" key={date}><h2>{date === today ? "Today" : prettyDate(date)}</h2><TaskList items={rows} animatingOut={animatingOut} goalNames={initial.goalNames} onToggle={toggleComplete} onEdit={(item) => editItem(item)} onDelete={removeItem} /></section>)}{completedItems.length > 0 && <details className="completed-disclosure"><summary>Completed · {completedItems.length}</summary><TaskList items={completedItems} goalNames={initial.goalNames} onToggle={toggleComplete} onEdit={(item) => editItem(item)} onDelete={removeItem} /></details>}</>}
         </section>}
@@ -609,6 +613,58 @@ function Dashboard({ items, goals, routines, today, layout, setView, onAddTask, 
       {widgets.map((widget) => <div key={widget.id} className="dashboard-grid-item">{card(widget)}</div>)}
     </ReactGridLayout>}{mounted && widgets.length === 0 && <div className="dashboard-empty"><h2>Your dashboard is clear</h2><p>Add a widget to bring back the information you want to see here.</p>{editing && <button className="secondary-button" onClick={() => setAddMenuOpen(true)}>＋ Add a widget</button>}</div>}</div>
   </section>;
+}
+
+function CalendarSplit({ calendar, agenda }: { calendar: ReactNode; agenda: ReactNode }) {
+  const root = useRef<HTMLDivElement>(null);
+  const [ratio, setRatio] = useState(0.64);
+  const [dragging, setDragging] = useState(false);
+  const clamp = (value: number) => Math.min(0.78, Math.max(0.38, value));
+
+  useEffect(() => {
+    const saved = Number(window.localStorage.getItem("daymark-calendar-split"));
+    if (Number.isFinite(saved) && saved >= 0.38 && saved <= 0.78) setRatio(saved);
+  }, []);
+
+  function persist(next: number) {
+    const value = clamp(next);
+    setRatio(value);
+    window.localStorage.setItem("daymark-calendar-split", String(value));
+  }
+
+  function updateFromClientX(clientX: number) {
+    const rect = root.current?.getBoundingClientRect();
+    if (!rect?.width) return;
+    persist((clientX - rect.left) / rect.width);
+  }
+
+  function handlePointerDown(event: ReactPointerEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setDragging(true);
+    updateFromClientX(event.clientX);
+  }
+
+  function handlePointerMove(event: ReactPointerEvent<HTMLButtonElement>) {
+    if (!event.currentTarget.hasPointerCapture(event.pointerId)) return;
+    updateFromClientX(event.clientX);
+  }
+
+  function handlePointerUp(event: ReactPointerEvent<HTMLButtonElement>) {
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+    setDragging(false);
+  }
+
+  return <div ref={root} className={`calendar-split${dragging ? " is-dragging" : ""}`} style={{ "--calendar-split": `${Math.round(ratio * 1000) / 10}%` } as CSSProperties}>
+    <div className="calendar-split-pane is-calendar">{calendar}</div>
+    <button type="button" className={`calendar-splitter${dragging ? " is-dragging" : ""}`} aria-label="Resize calendar and selected day" aria-orientation="vertical" aria-valuemin={38} aria-valuemax={78} aria-valuenow={Math.round(ratio * 100)} onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} onPointerCancel={handlePointerUp} onKeyDown={(event) => {
+      if (event.key === "ArrowLeft") { event.preventDefault(); persist(ratio - 0.03); }
+      if (event.key === "ArrowRight") { event.preventDefault(); persist(ratio + 0.03); }
+      if (event.key === "Home") { event.preventDefault(); persist(0.38); }
+      if (event.key === "End") { event.preventDefault(); persist(0.78); }
+    }}><span className="calendar-splitter-bar" aria-hidden="true" /></button>
+    <div className="calendar-split-pane is-agenda">{agenda}</div>
+  </div>;
 }
 
 function CalendarWeek({ startDate, selectedDate, today, itemsByDate, onSelectDate, onAdd, onEdit }: { startDate: string; selectedDate: string; today: string; itemsByDate: Record<string, Item[]>; onSelectDate: (date: string) => void; onAdd: (date: string) => void; onEdit: (item: Item) => void }) {
