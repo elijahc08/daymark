@@ -552,7 +552,7 @@ export function Planner({ initial }: { initial: Initial }) {
       </div>
     </main>
 
-    <nav className="mobile-nav" aria-label="Main navigation">{views.map((name) => <button key={name} className={view === name ? "active" : ""} onClick={() => setView(name)}>{name === "Dashboard" ? "Home" : name}</button>)}</nav>
+    <nav className="mobile-nav" aria-label="Main navigation">{views.map((name) => <button key={name} className={view === name ? "active" : ""} onClick={() => setView(name)} aria-current={view === name ? "page" : undefined}><span className={`nav-icon nav-icon-${name.toLowerCase().replace(" ", "-")}`} aria-hidden="true">{name === "Calendar" && <CalendarIcon />}</span><span className="mobile-nav-label">{name === "Dashboard" ? "Home" : name}</span></button>)}</nav>
     {notice && <div className="toast" role="status">{notice}</div>}
     {taskDialog && <TaskDialog key={`${selectedSeries?.id ?? "new"}-${selectedOccurrence?.occurrenceDate ?? "series"}`} series={selectedSeries} occurrence={selectedOccurrence} date={taskDialog.date} goals={goals} onClose={() => setTaskDialog(null)} onSubmit={handleTask} />}
     {goalDialog && <GoalDialog onClose={() => setGoalDialog(false)} onSubmit={handleGoal} />}

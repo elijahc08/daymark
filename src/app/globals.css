@@ -194,6 +194,39 @@ button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible { 
 .add-task-icon { width:15px; height:15px; flex:0 0 15px; }
 .add-task-icon::before { content:none; }
 .nav-icon-routines::before { content:"\f0ae"; }
+
+@media (max-width:700px) {
+  .main-content { padding-bottom:calc(68px + env(safe-area-inset-bottom)); }
+  .mobile-nav {
+    display:grid;
+    grid-template-columns:repeat(6,minmax(0,1fr));
+    align-items:center;
+    min-height:66px;
+    padding:5px 6px max(5px,env(safe-area-inset-bottom));
+    background:color-mix(in srgb,var(--surface) 94%,transparent);
+    backdrop-filter:blur(14px);
+    box-shadow:0 -6px 24px color-mix(in srgb,var(--text) 6%,transparent);
+  }
+  .mobile-nav button {
+    display:flex;
+    min-width:0;
+    min-height:48px;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:3px;
+    padding:4px 1px;
+    border-radius:10px;
+    font-size:10px;
+    line-height:1.1;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .mobile-nav button .nav-icon { width:22px; height:22px; flex:0 0 22px; font-size:16px; }
+  .mobile-nav button .nav-icon-calendar svg { width:18px; height:18px; }
+  .mobile-nav-label { max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .mobile-nav button.active { background:var(--accent-soft); color:var(--accent-dark); }
+  .mobile-nav button:focus-visible { outline:3px solid var(--focus); outline-offset:1px; }
+}
 .task-section-heading { margin:13px 0 4px; padding:9px 14px 5px; border-top:1px solid var(--line); color:var(--muted); font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
 .task-list > .task-section-heading:first-child { margin-top:0; border-top:0; }
 .routines-panel { display:grid; gap:20px; }
