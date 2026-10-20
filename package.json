@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "drizzle-kit push --force && next build",
+    "build": "DAYMARK_SKIP_SQLITE_WAL=1 drizzle-kit push --force && DAYMARK_SKIP_SQLITE_WAL=1 next build",
     "start": "drizzle-kit push --force && next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
