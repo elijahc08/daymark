@@ -127,7 +127,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible { 
 .sidebar-caption,.eyebrow { color:var(--muted); font-size:10px; font-weight:700; letter-spacing:1.35px; }
 .sidebar-caption { padding:0 12px 12px; }
 .main-nav { display:grid; gap:4px; }
-.nav-item { display:flex; align-items:center; gap:12px; width:100%; min-height:42px; padding:0 12px; border:0; border-radius:10px; background:transparent; color:var(--muted); text-align:left; transition:background .15s,color .15s; }
+.nav-item { display:flex; align-items:center; gap:12px; width:100%; min-height:42px; padding:0 12px; border:0; border-radius:10px; background:transparent; color:var(--muted); text-align:left; text-decoration:none; transition:background .15s,color .15s; }
 .nav-item:hover { background:var(--surface-soft); color:var(--text); }
 .nav-item.active { background:var(--accent-soft); color:var(--accent-dark); font-weight:700; }
 .nav-dot { width:8px; height:8px; border:1.5px solid currentColor; border-radius:3px; }
@@ -207,7 +207,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible { 
     backdrop-filter:blur(14px);
     box-shadow:0 -6px 24px color-mix(in srgb,var(--text) 6%,transparent);
   }
-  .mobile-nav button {
+  .mobile-nav a {
     display:flex;
     min-width:0;
     min-height:48px;
@@ -221,11 +221,12 @@ button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible { 
     line-height:1.1;
     -webkit-tap-highlight-color:transparent;
   }
-  .mobile-nav button .nav-icon { width:22px; height:22px; flex:0 0 22px; font-size:16px; }
-  .mobile-nav button .nav-icon-calendar svg { width:18px; height:18px; }
+  .mobile-nav a .nav-icon { width:22px; height:22px; flex:0 0 22px; font-size:16px; }
+  .mobile-nav a .nav-icon-calendar svg { width:18px; height:18px; }
   .mobile-nav-label { max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .mobile-nav button.active { background:var(--accent-soft); color:var(--accent-dark); }
-  .mobile-nav button:focus-visible { outline:3px solid var(--focus); outline-offset:1px; }
+  .mobile-nav a { color:var(--muted); text-decoration:none; }
+  .mobile-nav a.active { background:var(--accent-soft); color:var(--accent-dark); }
+  .mobile-nav a:focus-visible { outline:3px solid var(--focus); outline-offset:1px; }
 }
 .task-section-heading { margin:13px 0 4px; padding:9px 14px 5px; border-top:1px solid var(--line); color:var(--muted); font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
 .task-list > .task-section-heading:first-child { margin-top:0; border-top:0; }

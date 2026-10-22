@@ -38,7 +38,7 @@ When you change `src/db/schema.ts`, generate and apply a migration before relyin
 - **SQLite + Drizzle ORM** store tasks, goals, reusable routines, settings, and one-date exceptions. SQL migrations are in `drizzle/`.
 - **Zod** checks submitted values on the server. The database path and connection stay in server-only code.
 - **DayPicker** provides the keyboard-operable month grid. The task lists, agenda, navigation, dialogs, and styling are kept small and custom so they remain understandable.
-- The interface has Dashboard, Today, Calendar, All tasks, Goals, and Routines. Save named routine templates with ordered tasks, then schedule them once or repeat them using the same recurrence rules as tasks. Use Shift+N or the visible Add task button to create a task.
+- The interface has separate pages for Dashboard (`/`), Today (`/today`), Calendar (`/calendar`), All tasks (`/all-tasks`), Goals (`/goals`), and Routines (`/routines`). You can open or bookmark a page directly, and browser back/forward follows page navigation. Save named routine templates with ordered tasks, then schedule them once or repeat them using the same recurrence rules as tasks. Use Shift+N or the visible Add task button to create a task.
 - Calendar has Week, Month, and Year views. Week and Month show scheduled tasks on each date; Year summarizes tasks by month and places your saved goals beside the year overview. Goals are currently shared across years rather than assigned to a specific year.
 
 ## Repeating tasks: what to expect

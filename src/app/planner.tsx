@@ -2,6 +2,8 @@
 
 import { DayPicker, type DayButtonProps } from "@daypicker/react";
 import "@daypicker/react/style.css";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { HexColorInput, HexColorPicker } from "react-colorful";
 import ReactGridLayout, { useContainerWidth, verticalCompactor, type Layout } from "react-grid-layout";
 import { createContext, Fragment, useCallback, useContext, useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
@@ -13,11 +15,16 @@ type Item = { id: string; seriesId: string; originalDate: string; occurrenceDate
 type Goal = { id: string; title: string; endDate: string | null; completed: boolean; createdAt: string; updatedAt: string };
 type Series = { id: string; title: string; scheduledDate: string; startTime: string; endTime: string; durationMinutes: number; completed: boolean; goalId: string | null; recurrence: RepeatRule | null; routineGroupId: string | null; routineName: string | null; createdAt: string; updatedAt: string };
 type Routine = { id: string; name: string; steps: RoutineStep[]; createdAt: string; updatedAt: string };
-type Initial = { today: string; month: string; timeZone: string; theme: "light" | "dark" | "system"; accentColor: string; colorStyle: "hue" | "minimal"; fontStyle: "current" | "mono" | "serif" | "rounded" | "thin"; dashboardLayout: DashboardWidget[] | null; goals: Goal[]; routines: Routine[]; items: Item[]; series: Series[]; goalNames: Record<string, string> };
-type View = "Dashboard" | "Today" | "Calendar" | "All tasks" | "Goals" | "Routines";
+type Initial = { today: string; month: string; timeZone: string; theme: "light" | "dark" | "system"; accentColor: string; colorStyle: "hue" | "minimal"; fontStyle: "current" | "mono" | "serif" | "rounded" | "thin"; dashboardLayout: DashboardWidget[] | null; goals: Goal[]; routines: Routine[]; items: Item[]; series: Series[]; goalNames: Record<string, string>; view: View };
+export type PlannerView = "Dashboard" | "Today" | "Calendar" | "All tasks" | "Goals" | "Routines";
+type View = PlannerView;
 type CalendarMode = "Week" | "Month" | "Year";
 
 const views: View[] = ["Dashboard", "Today", "Calendar", "All tasks", "Goals", "Routines"];
+const viewPaths: Record<View, string> = { Dashboard: "/", Today: "/today", Calendar: "/calendar", "All tasks": "/all-tasks", Goals: "/goals", Routines: "/routines" };
+function viewFromPath(pathname: string): View {
+  return (Object.entries(viewPaths).find(([, path]) => path === pathname)?.[0] as View | undefined) ?? "Dashboard";
+}
 const weekdayNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 function hexToHsl(hex: string) {
   const red = Number.parseInt(hex.slice(1, 3), 16) / 255;
@@ -200,7 +207,13 @@ function MonthDayButton({ day, children, ...buttonProps }: DayButtonProps) {
 }
 
 export function Planner({ initial }: { initial: Initial }) {
-  const [view, setView] = useState<View>("Today");
+  const pathname = usePathname();
+  const router = useRouter();
+  const view = viewFromPath(pathname);
+  const setView = useCallback((nextView: View) => {
+    const path = viewPaths[nextView];
+    if (path !== pathname) router.push(path);
+  }, [pathname, router]);
   const [calendarMode, setCalendarMode] = useState<CalendarMode>("Month");
   const [items, setItems] = useState(initial.items);
   const [goals, setGoals] = useState(initial.goals);
@@ -496,12 +509,12 @@ export function Planner({ initial }: { initial: Initial }) {
 
   return <div className="app-shell">
     <aside className="sidebar">
-      <a href="#home" className="brand"><span className="brand-mark">d.</span><span>daymark</span></a>
+      <Link href="/" className="brand"><span className="brand-mark">d.</span><span>daymark</span></Link>
       <div className="sidebar-caption">YOUR SPACE</div>
       <nav aria-label="Main navigation" className="main-nav">
-        {views.map((name) => <button key={name} className={`nav-item ${view === name ? "active" : ""}`} onClick={() => setView(name)} aria-current={view === name ? "page" : undefined}>
+        {views.map((name) => <Link key={name} href={viewPaths[name]} className={`nav-item ${view === name ? "active" : ""}`} aria-current={view === name ? "page" : undefined}>
           <span className={`nav-icon nav-icon-${name.toLowerCase().replace(" ", "-")}`} aria-hidden="true">{name === "Calendar" && <CalendarIcon />}</span>{name}
-        </button>)}
+        </Link>)}
       </nav>
       <div className="sidebar-bottom">
         <div className="profile-chip"><span className="avatar">E</span><span><strong>Personal</strong><small>Private planner</small></span></div>
@@ -552,7 +565,7 @@ export function Planner({ initial }: { initial: Initial }) {
       </div>
     </main>
 
-    <nav className="mobile-nav" aria-label="Main navigation">{views.map((name) => <button key={name} className={view === name ? "active" : ""} onClick={() => setView(name)} aria-current={view === name ? "page" : undefined}><span className={`nav-icon nav-icon-${name.toLowerCase().replace(" ", "-")}`} aria-hidden="true">{name === "Calendar" && <CalendarIcon />}</span><span className="mobile-nav-label">{name === "Dashboard" ? "Home" : name}</span></button>)}</nav>
+    <nav className="mobile-nav" aria-label="Main navigation">{views.map((name) => <Link key={name} href={viewPaths[name]} className={view === name ? "active" : ""} aria-current={view === name ? "page" : undefined}><span className={`nav-icon nav-icon-${name.toLowerCase().replace(" ", "-")}`} aria-hidden="true">{name === "Calendar" && <CalendarIcon />}</span><span className="mobile-nav-label">{name === "Dashboard" ? "Home" : name}</span></Link>)}</nav>
     {notice && <div className="toast" role="status">{notice}</div>}
     {taskDialog && <TaskDialog key={`${selectedSeries?.id ?? "new"}-${selectedOccurrence?.occurrenceDate ?? "series"}`} series={selectedSeries} occurrence={selectedOccurrence} date={taskDialog.date} goals={goals} onClose={() => setTaskDialog(null)} onSubmit={handleTask} />}
     {goalDialog && <GoalDialog onClose={() => setGoalDialog(false)} onSubmit={handleGoal} />}
